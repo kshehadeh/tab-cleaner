@@ -16,6 +16,12 @@ main {
   gap: 12px;
 }
 
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -38,6 +44,12 @@ main {
 h1 {
   font-size: 1.1rem;
   margin: 0;
+}
+
+h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: color-mix(in srgb, currentColor 80%, transparent);
 }
 
 p {
@@ -69,14 +81,47 @@ p {
   min-height: 1.25rem;
 }
 
-#closed-tabs {
+.tab-list {
   margin: 0;
-  padding-left: 20px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  list-style: none;
 }
 
-#closed-tabs li {
-  list-style: disc;
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.tab-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tab-icon--empty {
+  background-color: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+#preview-status {
+  min-height: 1.25rem;
+}
+
+#closed-heading[hidden] {
+  display: none;
 }

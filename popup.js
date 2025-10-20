@@ -10,6 +10,45 @@ const THRESHOLD_OPTIONS = [
 const DEFAULT_THRESHOLD_MS = 60 * 60 * 1000;
 const STORAGE_KEY = "idleThresholdMs";
 
+function normalizeTab(tab) {
+  return {
+    id: typeof tab.id === "number" ? tab.id : null,
+    title:
+      typeof tab.title === "string" && tab.title.trim().length > 0
+        ? tab.title.trim()
+        : "",
+    url: typeof tab.url === "string" ? tab.url : "",
+    favIconUrl:
+      typeof tab.favIconUrl === "string" && tab.favIconUrl.trim().length > 0
+        ? tab.favIconUrl
+        : "",
+  };
+}
+
+async function fetchInactiveTabs(idleThresholdMs) {
+  const now = Date.now();
+  const tabs = await chrome.tabs.query({});
+
+  const inactiveTabs = tabs
+    .filter((tab) => {
+      return (
+        typeof tab.id === "number" &&
+        typeof tab.lastAccessed === "number" &&
+        now - tab.lastAccessed >= idleThresholdMs
+      );
+    })
+    .map(normalizeTab);
+
+  return {
+    inactiveTabs,
+    checkedCount: tabs.length,
+  };
+}
+
+function stripTabIds(tabs) {
+  return tabs.map(({ id, ...rest }) => rest);
+}
+
 async function getStoredThreshold() {
   try {
     const stored = await chrome.storage.local.get(STORAGE_KEY);
@@ -42,18 +81,11 @@ function getThresholdLabel(value) {
 }
 
 async function closeInactiveTabs(idleThresholdMs) {
-  const now = Date.now();
-  const tabs = await chrome.tabs.query({});
+  const { inactiveTabs, checkedCount } = await fetchInactiveTabs(
+    idleThresholdMs,
+  );
 
-  const removableTabs = tabs.filter((tab) => {
-    return (
-      typeof tab.id === "number" &&
-      typeof tab.lastAccessed === "number" &&
-      now - tab.lastAccessed >= idleThresholdMs
-    );
-  });
-
-  const removableTabIds = removableTabs
+  const removableTabIds = inactiveTabs
     .map((tab) => tab.id)
     .filter((id) => typeof id === "number");
 
@@ -61,16 +93,11 @@ async function closeInactiveTabs(idleThresholdMs) {
     await chrome.tabs.remove(removableTabIds);
   }
 
-  const closedTabs = removableTabs.map((tab) => ({
-    title: typeof tab.title === "string" && tab.title.trim().length > 0
-      ? tab.title
-      : "Untitled tab",
-    url: typeof tab.url === "string" ? tab.url : "",
-  }));
+  const closedTabs = stripTabIds(inactiveTabs);
 
   return {
     removedCount: removableTabIds.length,
-    checkedCount: tabs.length,
+    checkedCount,
     closedTabs,
   };
 }
@@ -87,7 +114,19 @@ function formatResultMessage({ removedCount }, thresholdLabel) {
   return `Closed ${removedCount} tabs that were inactive for over ${thresholdLabel}.`;
 }
 
-function renderClosedTabs(listElement, tabs) {
+function formatPreviewMessage(count, thresholdLabel) {
+  if (count === 0) {
+    return `No tabs have been inactive for at least ${thresholdLabel}.`;
+  }
+
+  if (count === 1) {
+    return `1 tab has been inactive for at least ${thresholdLabel} and would be closed.`;
+  }
+
+  return `${count} tabs have been inactive for at least ${thresholdLabel} and would be closed.`;
+}
+
+function renderTabList(listElement, tabs) {
   listElement.innerHTML = "";
 
   if (!Array.isArray(tabs) || tabs.length === 0) {
@@ -99,17 +138,40 @@ function renderClosedTabs(listElement, tabs) {
 
   tabs.forEach((tab) => {
     const listItem = document.createElement("li");
-    const title = tab.title || tab.url || "Untitled tab";
+    listItem.className = "tab-item";
 
-    if (tab.url) {
+    const icon = document.createElement("span");
+    icon.className = "tab-icon";
+
+    if (typeof tab.favIconUrl === "string" && tab.favIconUrl.length > 0) {
+      const image = document.createElement("img");
+      image.src = tab.favIconUrl;
+      image.alt = "";
+      image.referrerPolicy = "no-referrer";
+      image.loading = "lazy";
+      icon.appendChild(image);
+    } else {
+      icon.classList.add("tab-icon--empty");
+    }
+
+    listItem.appendChild(icon);
+
+    const title =
+      typeof tab.title === "string" && tab.title.trim().length > 0
+        ? tab.title
+        : "";
+    const url = typeof tab.url === "string" ? tab.url : "";
+    const displayText = title || url || "Untitled tab";
+
+    if (url) {
       const link = document.createElement("a");
-      link.href = tab.url;
-      link.textContent = title;
+      link.href = url;
+      link.textContent = displayText;
       link.target = "_blank";
       link.rel = "noreferrer noopener";
       listItem.appendChild(link);
     } else {
-      listItem.textContent = title;
+      listItem.appendChild(document.createTextNode(displayText));
     }
 
     fragment.appendChild(listItem);
@@ -123,9 +185,20 @@ async function setupPopup() {
   const button = document.getElementById("clean-button");
   const status = document.getElementById("status");
   const thresholdSelect = document.getElementById("idle-threshold");
+  const previewStatus = document.getElementById("preview-status");
+  const previewTabsList = document.getElementById("preview-tabs");
   const closedTabsList = document.getElementById("closed-tabs");
+  const closedHeading = document.getElementById("closed-heading");
 
-  if (!button || !status || !thresholdSelect || !closedTabsList) {
+  if (
+    !button ||
+    !status ||
+    !thresholdSelect ||
+    !previewStatus ||
+    !previewTabsList ||
+    !closedTabsList ||
+    !closedHeading
+  ) {
     return;
   }
 
@@ -133,18 +206,64 @@ async function setupPopup() {
     status.textContent = message;
   };
 
+  const setPreviewStatus = (message) => {
+    previewStatus.textContent = message;
+  };
+
+  const renderClosedTabs = (tabs) => {
+    renderTabList(closedTabsList, tabs);
+    closedHeading.hidden = !Array.isArray(tabs) || tabs.length === 0;
+  };
+
   const clearClosedTabs = () => {
-    renderClosedTabs(closedTabsList, []);
+    renderClosedTabs([]);
+  };
+
+  let previewRequestId = 0;
+
+  const updatePreview = async (idleThresholdMs) => {
+    const thresholdLabel = getThresholdLabel(idleThresholdMs);
+    const requestId = ++previewRequestId;
+
+    setPreviewStatus("Checking tabs...");
+    renderTabList(previewTabsList, []);
+
+    try {
+      const { inactiveTabs } = await fetchInactiveTabs(idleThresholdMs);
+      if (requestId !== previewRequestId) {
+        return;
+      }
+      const tabsWithoutIds = stripTabIds(inactiveTabs);
+
+      if (tabsWithoutIds.length === 0) {
+        setPreviewStatus(
+          `No tabs have been inactive for at least ${thresholdLabel}.`,
+        );
+        return;
+      }
+
+      setPreviewStatus(
+        formatPreviewMessage(tabsWithoutIds.length, thresholdLabel),
+      );
+      renderTabList(previewTabsList, tabsWithoutIds);
+    } catch (error) {
+      console.error("Failed to prepare tab preview", error);
+      if (requestId === previewRequestId) {
+        setPreviewStatus("Couldn't check tabs right now.");
+      }
+    }
   };
 
   const storedThreshold = await getStoredThreshold();
   thresholdSelect.value = String(storedThreshold);
+  await updatePreview(storedThreshold);
 
   thresholdSelect.addEventListener("change", async () => {
     const selectedValue = Number(thresholdSelect.value);
 
     if (Number.isFinite(selectedValue)) {
       await saveThreshold(selectedValue);
+      await updatePreview(selectedValue);
     }
   });
 
@@ -160,12 +279,15 @@ async function setupPopup() {
       await saveThreshold(selectedValue);
       const result = await closeInactiveTabs(selectedValue);
       setStatus(formatResultMessage(result, thresholdLabel));
-      renderClosedTabs(closedTabsList, result.closedTabs);
+      renderClosedTabs(result.closedTabs);
     } catch (error) {
       console.error("Failed to clean tabs", error);
       setStatus("Something went wrong while cleaning tabs.");
     } finally {
       button.disabled = false;
+      updatePreview(selectedValue).catch((error) => {
+        console.error("Failed to refresh preview after cleanup", error);
+      });
     }
   });
 }

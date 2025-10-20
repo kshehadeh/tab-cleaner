@@ -21,10 +21,16 @@
           <option value="86400000">1 day</option>
         </select>
       </div>
+      <section id="preview">
+        <h2>Ready to close</h2>
+        <p id="preview-status" role="status" aria-live="polite"></p>
+        <ul id="preview-tabs" class="tab-list" hidden></ul>
+      </section>
       <button id="clean-button" type="button">Clean Inactive Tabs</button>
       <div id="results">
         <p id="status" role="status" aria-live="polite"></p>
-        <ul id="closed-tabs" hidden></ul>
+        <h2 id="closed-heading" hidden>Closed tabs</h2>
+        <ul id="closed-tabs" class="tab-list" hidden></ul>
       </div>
     </main>
     <script src="popup.js" type="module"></script>
