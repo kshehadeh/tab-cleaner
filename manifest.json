@@ -4,7 +4,7 @@
   "description": "Quickly close tabs that have been inactive for a chosen amount of time. Clean up your browser with a beautiful, modern interface.",
   "version": "1.0.0",
   "author": "Your Name",
-  "homepage_url": "https://github.com/yourusername/tab-cleaner",
+  "homepage_url": "https://github.com/kshehadeh/tab-cleaner",
   "permissions": [
     "tabs",
     "storage"
