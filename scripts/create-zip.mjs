@@ -1,8 +1,5 @@
 import { createWriteStream } from 'node:fs';
-import { createReadStream, readdir, stat } from 'node:fs/promises';
-import { join, relative } from 'node:path';
-import { createGzip } from 'node:zlib';
-import { pipeline } from 'node:stream/promises';
+import { stat } from 'node:fs/promises';
 import archiver from 'archiver';
 
 async function createZipPackage() {
