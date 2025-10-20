@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -12,6 +16,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -29,6 +35,11 @@ jobs:
       id: version
       run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
       
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
     - name: Check if release exists
       id: check_release
       run: |
