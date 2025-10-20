@@ -14,7 +14,7 @@ A beautiful browser extension to clean inactive tabs with a modern UI built usin
 
 ### Prerequisites
 
-- Node.js 16+ 
+- Node.js 16+
 - npm
 
 ### Setup
@@ -33,6 +33,7 @@ npm run dev
 ### Building
 
 The extension is built using:
+
 - **React 18** - Modern React with hooks
 - **TypeScript** - Type safety and better development experience  
 - **Vite** - Fast build tool and dev server
@@ -61,13 +62,9 @@ src/
 
 1. Build the extension: `npm run build`
 2. Load the extension in Chrome:
-   - Open `chrome://extensions/` 
+   - Open `chrome://extensions/`
    - Enable "Developer mode"
-   - Click "Load unpacked" 
+   - Click "Load unpacked"
    - Select this project folder
 
 The extension will use the built files in the `dist/` directory.
-
-## Original Files
-
-The original vanilla JavaScript implementation is preserved in the `original/` directory.

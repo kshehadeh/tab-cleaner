@@ -1,8 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Tab Cleaner",
-  "description": "Quickly close tabs that have been inactive for a chosen amount of time.",
+  "description": "Quickly close tabs that have been inactive for a chosen amount of time. Clean up your browser with a beautiful, modern interface.",
   "version": "1.0.0",
+  "author": "Your Name",
+  "homepage_url": "https://github.com/yourusername/tab-cleaner",
   "permissions": [
     "tabs",
     "storage"
@@ -22,5 +24,8 @@
       "48": "images/icon-48.png",
       "128": "images/icon-128.png"
     }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }
