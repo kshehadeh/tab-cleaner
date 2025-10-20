@@ -1,6 +1,6 @@
 # Privacy Policy for Tab Cleaner Extension
 
-**Last updated: [Current Date]**
+**Last updated: 2025-10-20**
 
 ## Overview
 
