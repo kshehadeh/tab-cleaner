@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -15,9 +15,14 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      input: resolve(__dirname, 'src/popup.html'),
+      input: {
+        popup: path.resolve(__dirname, 'src/popup.html'),
+        background: path.resolve(__dirname, 'src/background.ts'),
+      },
       output: {
-        entryFileNames: 'popup.js',
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === 'background' ? 'background.js' : 'popup.js';
+        },
         chunkFileNames: '[name].js',
         assetFileNames: 'popup.css',
         manualChunks: undefined,
@@ -28,7 +33,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
 })
