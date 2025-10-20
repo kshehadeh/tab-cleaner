@@ -16,6 +16,25 @@ main {
   gap: 12px;
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, currentColor 65%, transparent);
+}
+
+.field select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
+}
+
 h1 {
   font-size: 1.1rem;
   margin: 0;
@@ -40,6 +59,24 @@ p {
   background-color: color-mix(in srgb, currentColor 20%, transparent);
 }
 
+#results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 #status {
   min-height: 1.25rem;
+}
+
+#closed-tabs {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#closed-tabs li {
+  list-style: disc;
 }
