@@ -42,6 +42,26 @@ The extension is built using:
 - **Radix UI** - Unstyled, accessible UI primitives
 - **Lucide React** - Beautiful icons
 
+### Version Management
+
+The project includes a custom version update script that keeps both `package.json` and `manifest.json` versions in sync:
+
+```bash
+# Update patch version (1.0.0 -> 1.0.1)
+npm run version:patch
+
+# Update minor version (1.0.0 -> 1.1.0)  
+npm run version:minor
+
+# Update major version (1.0.0 -> 2.0.0)
+npm run version:major
+
+# Create prerelease version (1.0.0 -> 1.0.0-beta.1)
+npm run version:prerelease
+```
+
+The version script automatically updates both files to ensure consistency across the extension manifest and package configuration.
+
 ### Project Structure
 
 ```
