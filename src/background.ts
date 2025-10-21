@@ -121,6 +121,25 @@ function formatResultMessage({ removedCount }: { removedCount: number }, thresho
   return `Closed ${removedCount} tabs that were inactive for over ${thresholdLabel}.`;
 }
 
+// Get configured keyboard shortcuts
+async function getConfiguredCommands() {
+  try {
+    const commands = await chrome.commands.getAll();
+    const commandMap: Record<string, string> = {};
+    
+    commands.forEach(command => {
+      if (command.shortcut && command.name) {
+        commandMap[command.name] = command.shortcut;
+      }
+    });
+    
+    return commandMap;
+  } catch (error) {
+    console.warn('Failed to get configured commands', error);
+    return {};
+  }
+}
+
 // Handle keyboard shortcuts
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === 'quick-clean-tabs') {
@@ -154,5 +173,15 @@ chrome.commands.onCommand.addListener(async (command) => {
         message: 'Something went wrong while cleaning tabs.',
       });
     }
+  }
+});
+
+// Handle messages from popup
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  if (request.action === 'getCommands') {
+    getConfiguredCommands().then(commands => {
+      sendResponse(commands);
+    });
+    return true; // Indicates we will send a response asynchronously
   }
 });

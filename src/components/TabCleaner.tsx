@@ -17,6 +17,7 @@ import {
   formatResultMessage,
   formatPreviewMessage,
   stripTabIds,
+  getConfiguredCommands,
 } from '../lib/tab-utils';
 
 interface TabItemProps {
@@ -110,14 +111,19 @@ const TabCleaner: React.FC = () => {
   const [closedTabs, setClosedTabs] = useState<Omit<TabInfo, 'id'>[]>([]);
   const [statusMessage, setStatusMessage] = useState('');
   const [previewMessage, setPreviewMessage] = useState('');
+  const [configuredCommands, setConfiguredCommands] = useState<Record<string, string>>({});
 
-  // Load stored threshold on component mount
+  // Load stored threshold and configured commands on component mount
   useEffect(() => {
-    const loadThreshold = async () => {
-      const storedThreshold = await getStoredThreshold();
+    const loadData = async () => {
+      const [storedThreshold, commands] = await Promise.all([
+        getStoredThreshold(),
+        getConfiguredCommands(),
+      ]);
       setThreshold(storedThreshold);
+      setConfiguredCommands(commands);
     };
-    loadThreshold();
+    loadData();
   }, []);
 
   // Update preview when threshold changes
@@ -195,7 +201,11 @@ const TabCleaner: React.FC = () => {
             Tab Cleaner
           </CardTitle>
           <CardDescription className="text-sm text-white/70">
-            Clean tabs that have been inactive for a chosen amount of time.
+            {configuredCommands['_execute_action'] ? (
+              <>Press <kbd className="bg-white/20 text-white/80 px-1 py-0.5 rounded text-xs">{configuredCommands['_execute_action']}</kbd> to open this popup</>
+            ) : (
+              'Clean tabs that have been inactive for a chosen amount of time.'
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 p-4 pt-4">
@@ -253,6 +263,11 @@ const TabCleaner: React.FC = () => {
               <>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clean Inactive Tabs
+                {configuredCommands['quick-clean-tabs'] && (
+                  <kbd className="ml-auto text-xs text-muted-foreground px-1.5 py-0.5">
+                    ({configuredCommands['quick-clean-tabs']})
+                  </kbd>
+                )}
               </>
             )}
           </Button>

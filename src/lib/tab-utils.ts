@@ -148,3 +148,17 @@ export function formatPreviewMessage(count: number, thresholdLabel: string): str
 
   return `${count} tabs have been inactive for at least ${thresholdLabel} and would be closed.`;
 }
+
+// Get configured keyboard shortcuts from background script
+export async function getConfiguredCommands(): Promise<Record<string, string>> {
+  try {
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: 'getCommands' }, (response) => {
+        resolve(response || {});
+      });
+    });
+  } catch (error) {
+    console.warn('Failed to get configured commands', error);
+    return {};
+  }
+}
