@@ -12,6 +12,7 @@ const THRESHOLD_OPTIONS = [
 
 const DEFAULT_THRESHOLD_MS = 60 * 60 * 1000;
 const STORAGE_KEY = "idleThresholdMs";
+const IGNORE_GROUPS_STORAGE_KEY = "ignoreTabsInGroups";
 
 const NON_APP_WINDOW_TYPES: chrome.windows.windowTypeEnum[] = [
   "normal",
@@ -44,7 +45,7 @@ function normalizeTab(tab: chrome.tabs.Tab) {
   };
 }
 
-async function fetchInactiveTabs(idleThresholdMs: number) {
+async function fetchInactiveTabs(idleThresholdMs: number, ignoreGroups: boolean = false) {
   const now = Date.now();
   const tabs = await queryTabsExcludingApps();
 
@@ -55,6 +56,14 @@ async function fetchInactiveTabs(idleThresholdMs: number) {
         typeof (tab as any).lastAccessed === "number" &&
         now - (tab as any).lastAccessed >= idleThresholdMs
       );
+    })
+    .filter((tab) => {
+      // If ignoreGroups is true, skip tabs that are in groups
+      // Tabs not in groups have groupId: -1, tabs in groups have groupId >= 0
+      if (ignoreGroups && typeof tab.groupId === "number" && tab.groupId > -1) {
+        return false;
+      }
+      return true;
     })
     .map(normalizeTab);
 
@@ -82,14 +91,25 @@ async function getStoredThreshold(): Promise<number> {
   return DEFAULT_THRESHOLD_MS;
 }
 
+async function getIgnoreGroupsSetting(): Promise<boolean> {
+  try {
+    const stored = await chrome.storage.local.get(IGNORE_GROUPS_STORAGE_KEY);
+    return stored[IGNORE_GROUPS_STORAGE_KEY] === true;
+  } catch (error) {
+    console.warn("Failed to read ignore groups setting", error);
+    return false;
+  }
+}
+
 function getThresholdLabel(value: number): string {
   const option = THRESHOLD_OPTIONS.find((entry) => entry.value === value);
   return option ? option.label : `${Math.round(value / (60 * 1000))} minutes`;
 }
 
-async function closeInactiveTabs(idleThresholdMs: number) {
+async function closeInactiveTabs(idleThresholdMs: number, ignoreGroups: boolean = false) {
   const { inactiveTabs, checkedCount } = await fetchInactiveTabs(
     idleThresholdMs,
+    ignoreGroups,
   );
 
   const removableTabIds = inactiveTabs
@@ -144,12 +164,15 @@ async function getConfiguredCommands() {
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === 'quick-clean-tabs') {
     try {
-      // Get the stored threshold or use default
-      const threshold = await getStoredThreshold();
+      // Get the stored threshold and ignore groups setting
+      const [threshold, ignoreGroups] = await Promise.all([
+        getStoredThreshold(),
+        getIgnoreGroupsSetting(),
+      ]);
       const thresholdLabel = getThresholdLabel(threshold);
       
       // Execute the same logic as the button click
-      const result = await closeInactiveTabs(threshold);
+      const result = await closeInactiveTabs(threshold, ignoreGroups);
       
       // Show notification with result
       const message = formatResultMessage(result, thresholdLabel);

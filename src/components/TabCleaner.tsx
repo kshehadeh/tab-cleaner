@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
+import { Checkbox } from './ui/checkbox';
 import { Trash2, Clock, Globe, Loader2 } from 'lucide-react';
 import {
   THRESHOLD_OPTIONS,
@@ -15,9 +16,10 @@ import {
   getThresholdLabel,
   closeInactiveTabs,
   formatResultMessage,
-  formatPreviewMessage,
   stripTabIds,
   getConfiguredCommands,
+  getIgnoreGroupsSetting,
+  saveIgnoreGroupsSetting,
 } from '../lib/tab-utils';
 
 interface TabItemProps {
@@ -106,54 +108,49 @@ const TabList: React.FC<TabListProps> = ({ tabs, title, isVisible }) => {
 
 const TabCleaner: React.FC = () => {
   const [threshold, setThreshold] = useState<number>(DEFAULT_THRESHOLD_MS);
+  const [ignoreGroups, setIgnoreGroups] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewTabs, setPreviewTabs] = useState<Omit<TabInfo, 'id'>[]>([]);
   const [closedTabs, setClosedTabs] = useState<Omit<TabInfo, 'id'>[]>([]);
-  const [statusMessage, setStatusMessage] = useState('');
-  const [previewMessage, setPreviewMessage] = useState('');
   const [configuredCommands, setConfiguredCommands] = useState<Record<string, string>>({});
 
   // Load stored threshold and configured commands on component mount
   useEffect(() => {
     const loadData = async () => {
-      const [storedThreshold, commands] = await Promise.all([
+      const [storedThreshold, commands, storedIgnoreGroups] = await Promise.all([
         getStoredThreshold(),
         getConfiguredCommands(),
+        getIgnoreGroupsSetting(),
       ]);
       setThreshold(storedThreshold);
+      setIgnoreGroups(storedIgnoreGroups);
       setConfiguredCommands(commands);
     };
     loadData();
   }, []);
 
   // Update preview when threshold changes
-  const updatePreview = useCallback(async (idleThresholdMs: number) => {
-    const thresholdLabel = getThresholdLabel(idleThresholdMs);
-
-    setPreviewMessage('Checking tabs...');
+  const updatePreview = useCallback(async (idleThresholdMs: number, ignoreGroupsSetting: boolean) => {
     setPreviewTabs([]);
 
     try {
-      const { inactiveTabs } = await fetchInactiveTabs(idleThresholdMs);
+      const { inactiveTabs } = await fetchInactiveTabs(idleThresholdMs, ignoreGroupsSetting);
       const tabsWithoutIds = stripTabIds(inactiveTabs);
 
       if (tabsWithoutIds.length === 0) {
-        setPreviewMessage(`No tabs have been inactive for at least ${thresholdLabel}.`);
         return;
       }
 
-      setPreviewMessage(formatPreviewMessage(tabsWithoutIds.length, thresholdLabel));
       setPreviewTabs(tabsWithoutIds);
     } catch (error) {
       console.error('Failed to prepare tab preview', error);
-      setPreviewMessage("Couldn't check tabs right now.");
     }
   }, []);
 
-  // Update preview when threshold changes
+  // Update preview when threshold or ignoreGroups changes
   useEffect(() => {
-    updatePreview(threshold);
-  }, [threshold, updatePreview]);
+    updatePreview(threshold, ignoreGroups);
+  }, [threshold, ignoreGroups, updatePreview]);
 
   const handleThresholdChange = async (value: string) => {
     const selectedValue = Number(value);
@@ -164,25 +161,26 @@ const TabCleaner: React.FC = () => {
     }
   };
 
-  const handleCleanTabs = async () => {
-    const thresholdLabel = getThresholdLabel(threshold);
-    
+  const handleIgnoreGroupsChange = async (checked: boolean) => {
+    setIgnoreGroups(checked);
+    await saveIgnoreGroupsSetting(checked);
+  };
+
+  const handleCleanTabs = async () => {   
     setIsLoading(true);
-    setStatusMessage('Scanning tabs...');
     setClosedTabs([]);
 
     try {
       await saveThreshold(threshold);
-      const result = await closeInactiveTabs(threshold);
-      setStatusMessage(formatResultMessage(result, thresholdLabel));
+      await saveIgnoreGroupsSetting(ignoreGroups);
+      const result = await closeInactiveTabs(threshold, ignoreGroups);
       setClosedTabs(result.closedTabs);
     } catch (error) {
       console.error('Failed to clean tabs', error);
-      setStatusMessage('Something went wrong while cleaning tabs.');
     } finally {
       setIsLoading(false);
       // Refresh preview after cleanup
-      updatePreview(threshold).catch((error) => {
+      updatePreview(threshold, ignoreGroups).catch((error) => {
         console.error('Failed to refresh preview after cleanup', error);
       });
     }
@@ -227,6 +225,20 @@ const TabCleaner: React.FC = () => {
             </Select>
           </div>
 
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="ignore-groups" 
+              checked={ignoreGroups}
+              onCheckedChange={handleIgnoreGroupsChange}
+            />
+            <label 
+              htmlFor="ignore-groups" 
+              className="text-sm font-medium text-foreground cursor-pointer"
+            >
+              Ignore tabs in groups
+            </label>
+          </div>
+
           <Separator />
 
           <div className="space-y-3">
@@ -234,12 +246,6 @@ const TabCleaner: React.FC = () => {
               <Clock className="w-4 h-4 text-muted-foreground" />
               <h3 className="text-sm font-medium text-foreground">Ready to close</h3>
             </div>
-            
-            {previewMessage && (
-              <p className="text-sm text-muted-foreground">
-                {previewMessage}
-              </p>
-            )}
             
             <TabList 
               tabs={previewTabs}
@@ -272,18 +278,12 @@ const TabCleaner: React.FC = () => {
             )}
           </Button>
 
-          {statusMessage && (
+          {closedTabs.length > 0 && (
             <div className="space-y-3">
               <Separator />
               <p className="text-sm text-foreground font-medium">
-                {statusMessage}
+                {formatResultMessage({ removedCount: closedTabs.length }, getThresholdLabel(threshold))}
               </p>
-              
-              <TabList 
-                tabs={closedTabs}
-                title="Closed tabs"
-                isVisible={closedTabs.length > 0}
-              />
             </div>
           )}
         </CardContent>

@@ -9,6 +9,7 @@ export const THRESHOLD_OPTIONS = [
 
 export const DEFAULT_THRESHOLD_MS = 60 * 60 * 1000;
 export const STORAGE_KEY = "idleThresholdMs";
+export const IGNORE_GROUPS_STORAGE_KEY = "ignoreTabsInGroups";
 
 export interface TabInfo {
   id: number | null;
@@ -48,7 +49,7 @@ export function normalizeTab(tab: chrome.tabs.Tab): TabInfo {
   };
 }
 
-export async function fetchInactiveTabs(idleThresholdMs: number) {
+export async function fetchInactiveTabs(idleThresholdMs: number, ignoreGroups: boolean = false) {
   const now = Date.now();
   const tabs = await queryTabsExcludingApps();
 
@@ -59,6 +60,14 @@ export async function fetchInactiveTabs(idleThresholdMs: number) {
         typeof (tab as any).lastAccessed === "number" &&
         now - (tab as any).lastAccessed >= idleThresholdMs
       );
+    })
+    .filter((tab) => {
+      // If ignoreGroups is true, skip tabs that are in groups
+      // Tabs not in groups have groupId: -1, tabs in groups have groupId >= 0
+      if (ignoreGroups && typeof tab.groupId === "number" && tab.groupId > -1) {
+        return false;
+      }
+      return true;
     })
     .map(normalizeTab);
 
@@ -98,14 +107,33 @@ export async function saveThreshold(value: number): Promise<void> {
   }
 }
 
+export async function getIgnoreGroupsSetting(): Promise<boolean> {
+  try {
+    const stored = await chrome.storage.local.get(IGNORE_GROUPS_STORAGE_KEY);
+    return stored[IGNORE_GROUPS_STORAGE_KEY] === true;
+  } catch (error) {
+    console.warn("Failed to read ignore groups setting", error);
+    return false;
+  }
+}
+
+export async function saveIgnoreGroupsSetting(value: boolean): Promise<void> {
+  try {
+    await chrome.storage.local.set({ [IGNORE_GROUPS_STORAGE_KEY]: value });
+  } catch (error) {
+    console.warn("Failed to persist ignore groups setting", error);
+  }
+}
+
 export function getThresholdLabel(value: number): string {
   const option = THRESHOLD_OPTIONS.find((entry) => entry.value === value);
   return option ? option.label : `${Math.round(value / (60 * 1000))} minutes`;
 }
 
-export async function closeInactiveTabs(idleThresholdMs: number) {
+export async function closeInactiveTabs(idleThresholdMs: number, ignoreGroups: boolean = false) {
   const { inactiveTabs, checkedCount } = await fetchInactiveTabs(
     idleThresholdMs,
+    ignoreGroups,
   );
 
   const removableTabIds = inactiveTabs
