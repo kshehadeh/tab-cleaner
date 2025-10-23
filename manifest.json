@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Tab Cleaner",
   "description": "Quickly close tabs that have been inactive for a chosen amount of time. Clean up your browser with a beautiful, modern interface.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Your Name",
   "homepage_url": "https://github.com/kshehadeh/tab-cleaner",
   "permissions": [
