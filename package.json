@@ -1,6 +1,6 @@
 {
   "name": "tab-cleaner-extension",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A browser extension to clean inactive tabs with a beautiful UI",
   "type": "module",
   "scripts": {
