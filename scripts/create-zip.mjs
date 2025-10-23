@@ -30,6 +30,7 @@ async function createZipPackage() {
     'dist/popup.html',
     'dist/popup.js',
     'dist/popup.css',
+    'dist/background.js',
     'images/icon-16.png',
     'images/icon-32.png',
     'images/icon-48.png',
