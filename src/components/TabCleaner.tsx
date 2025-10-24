@@ -244,7 +244,9 @@ const TabCleaner: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
-              <h3 className="text-sm font-medium text-foreground">Ready to close</h3>
+              <h3 className="text-sm font-medium text-foreground">
+                {previewTabs.length > 0 ? 'Ready to close' : 'No tabs to close'}
+              </h3>
             </div>
             
             <TabList 
@@ -256,7 +258,7 @@ const TabCleaner: React.FC = () => {
 
           <Button 
             onClick={handleCleanTabs} 
-            disabled={isLoading}
+            disabled={isLoading || previewTabs.length === 0}
             className="w-full"
             size="lg"
           >
