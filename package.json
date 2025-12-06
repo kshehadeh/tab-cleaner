@@ -1,6 +1,6 @@
 {
   "name": "tab-magic",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "A browser extension to clean inactive tabs with a beautiful UI",
   "type": "module",
   "scripts": {
