@@ -1,16 +1,16 @@
-# Privacy Policy for Tab Cleaner Extension
+# Privacy Policy for Tab Magic Extension
 
 **Last updated: 2025-10-20**
 
 ## Overview
 
-Tab Cleaner is a browser extension that helps users manage their browser tabs by closing inactive tabs. This privacy policy explains how we handle your data.
+Tab Magic is a browser extension that helps users manage their browser tabs by closing inactive tabs. This privacy policy explains how we handle your data.
 
 ## Data Collection and Usage
 
 ### What Data We Collect
 
-Tab Cleaner collects minimal data necessary for its functionality:
+Tab Magic collects minimal data necessary for its functionality:
 
 - **Tab Information**: The extension accesses information about your browser tabs (URLs, titles, last active time) to identify inactive tabs
 - **Storage Data**: Your preferences (time thresholds, settings) are stored locally in your browser
@@ -34,14 +34,14 @@ All data is stored locally in your browser using Chrome's storage API. No data i
 
 ## Permissions
 
-Tab Cleaner requests the following permissions:
+Tab Magic requests the following permissions:
 
 - **tabs**: Required to access tab information and close inactive tabs
 - **storage**: Required to save your preferences locally
 
 ## Third-Party Services
 
-Tab Cleaner does not use any third-party services, analytics, or tracking tools.
+Tab Magic does not use any third-party services, analytics, or tracking tools.
 
 ## Data Security
 

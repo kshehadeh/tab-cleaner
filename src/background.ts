@@ -1,4 +1,4 @@
-// Background script for Tab Cleaner extension
+// Background script for Tab Magic extension
 // Handles keyboard shortcuts for quick tab cleaning
 
 const THRESHOLD_OPTIONS = [
@@ -181,7 +181,7 @@ chrome.commands.onCommand.addListener(async (command) => {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'images/icon-48.png',
-        title: 'Tab Cleaner',
+        title: 'Tab Magic',
         message: message,
       });
       
@@ -192,8 +192,156 @@ chrome.commands.onCommand.addListener(async (command) => {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'images/icon-48.png',
-        title: 'Tab Cleaner',
+        title: 'Tab Magic',
         message: 'Something went wrong while cleaning tabs.',
+      });
+    }
+  } else if (command === 'copy-current-tab-url') {
+    try {
+      // Get the current active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (tab && tab.url) {
+        const url = tab.url;
+        
+        // Use chrome.scripting to execute clipboard copy and show notification in the tab's context
+        if (tab.id) {
+          try {
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: (textToCopy: string) => {
+                // Copy to clipboard
+                navigator.clipboard.writeText(textToCopy);
+                
+                // Create and show in-page notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                  position: fixed;
+                  top: 20px;
+                  right: 20px;
+                  background: #10b981;
+                  color: white;
+                  padding: 16px 24px;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+                  z-index: 2147483647;
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  font-size: 14px;
+                  font-weight: 500;
+                  max-width: 400px;
+                  word-break: break-all;
+                  animation: slideIn 0.3s ease-out;
+                `;
+                
+                // Add animation keyframes
+                const style = document.createElement('style');
+                style.textContent = `
+                  @keyframes slideIn {
+                    from {
+                      transform: translateX(400px);
+                      opacity: 0;
+                    }
+                    to {
+                      transform: translateX(0);
+                      opacity: 1;
+                    }
+                  }
+                  @keyframes slideOut {
+                    from {
+                      transform: translateX(0);
+                      opacity: 1;
+                    }
+                    to {
+                      transform: translateX(400px);
+                      opacity: 0;
+                    }
+                  }
+                `;
+                document.head.appendChild(style);
+                
+                notification.innerHTML = `
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill="currentColor"/>
+                    </svg>
+                    <div>
+                      <div style="font-weight: 600; margin-bottom: 4px;">URL Copied!</div>
+                      <div style="font-size: 12px; opacity: 0.9;">${textToCopy.length > 60 ? textToCopy.substring(0, 57) + '...' : textToCopy}</div>
+                    </div>
+                  </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove notification after 3 seconds
+                setTimeout(() => {
+                  notification.style.animation = 'slideOut 0.3s ease-in';
+                  setTimeout(() => {
+                    document.body.removeChild(notification);
+                    document.head.removeChild(style);
+                  }, 300);
+                }, 3000);
+              },
+              args: [url]
+            });
+          } catch (scriptError) {
+            // If script injection fails (e.g., on restricted pages), show browser notification
+            console.warn('Script injection failed, falling back to browser notification:', scriptError);
+            
+            chrome.notifications.create({
+              type: 'basic',
+              iconUrl: 'images/icon-48.png',
+              title: 'Tab Magic',
+              message: `URL: ${url}`,
+            });
+          }
+        }
+      } else {
+        // No tab found - show browser notification
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'images/icon-48.png',
+          title: 'Tab Magic',
+          message: 'Could not get current tab URL.',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to copy URL via command', error);
+      
+      // Show error notification
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'images/icon-48.png',
+        title: 'Tab Magic',
+        message: 'Something went wrong while copying URL.',
+      });
+    }
+  } else if (command === 'duplicate-current-tab') {
+    try {
+      // Get the current active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (tab && tab.id) {
+        // Duplicate the tab
+        await chrome.tabs.duplicate(tab.id);
+      } else {
+        // No tab found - show browser notification
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'images/icon-48.png',
+          title: 'Tab Magic',
+          message: 'Could not duplicate tab. No active tab found.',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to duplicate tab via command', error);
+      
+      // Show error notification
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'images/icon-48.png',
+        title: 'Tab Magic',
+        message: 'Something went wrong while duplicating tab.',
       });
     }
   }

@@ -3,7 +3,7 @@ import { stat } from 'node:fs/promises';
 import archiver from 'archiver';
 
 async function createZipPackage() {
-  const output = createWriteStream('tab-cleaner-extension.zip');
+  const output = createWriteStream('tab-magic.zip');
   const archive = archiver('zip', {
     zlib: { level: 9 } // Maximum compression
   });
@@ -53,12 +53,12 @@ async function createZipPackage() {
   await archive.finalize();
   
   output.on('close', () => {
-    console.log(`\n🎉 Extension package created: tab-cleaner-extension.zip`);
+    console.log(`\n🎉 Extension package created: tab-magic.zip`);
     console.log(`📦 Archive size: ${archive.pointer()} bytes`);
     console.log(`\n📋 Next steps:`);
     console.log(`1. Go to Chrome Web Store Developer Dashboard`);
     console.log(`2. Click "Add new item"`);
-    console.log(`3. Upload tab-cleaner-extension.zip`);
+    console.log(`3. Upload tab-magic.zip`);
     console.log(`4. Fill in store listing details`);
     console.log(`5. Submit for review`);
   });

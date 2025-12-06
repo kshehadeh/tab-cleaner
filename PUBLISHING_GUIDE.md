@@ -2,7 +2,7 @@
 
 ## 🚀 Complete Publishing Checklist
 
-Your Tab Cleaner extension is now ready for Chrome Web Store submission! Here's your step-by-step guide:
+Your Tab Magic extension is now ready for Chrome Web Store submission! Here's your step-by-step guide:
 
 ## 📋 Pre-Submission Checklist
 
@@ -19,8 +19,8 @@ Your Tab Cleaner extension is now ready for Chrome Web Store submission! Here's 
 - [x] Screenshots (1-5 images, 1280x800 or 640x400)
 - [x] Store description (use content from `STORE_LISTING.md`)
 - [x] Category selection (Productivity)
-- [x] Keywords and tags (tab manager, browser cleanup, productivity, memory optimization, tab organizer, inactive tabs, tab cleaner, browser tools, chrome extension, tab management, browser performance, automatic tab closer, tab control, browser productivity)
-- [x] Privacy policy URL (https://github.com/kshehadeh/tab-cleaner/blob/main/PRIVACY_POLICY.md)
+- [x] Keywords and tags (tab manager, browser cleanup, productivity, memory optimization, tab organizer, inactive tabs, tab magic, browser tools, chrome extension, tab management, browser performance, automatic tab closer, tab control, browser productivity)
+- [x] Privacy policy URL (https://github.com/kshehadeh/tab-magic/blob/main/PRIVACY_POLICY.md)
 
 ## 🛠️ Build and Package Your Extension
 
@@ -35,7 +35,7 @@ npm run build:prod
 npm run package
 ```
 
-This will create `tab-cleaner-extension.zip` ready for upload.
+This will create `tab-magic.zip` ready for upload.
 
 ## 📸 Create Required Screenshots
 
@@ -57,7 +57,7 @@ Follow the guide in `STORE_ASSETS_GUIDE.md` to create:
 ### Step 2: Create New Extension
 
 1. Click "Add new item"
-2. Upload `tab-cleaner-extension.zip`
+2. Upload `tab-magic.zip`
 3. Wait for upload to complete
 
 ### Step 3: Fill Store Listing
@@ -66,7 +66,7 @@ Use the content from `STORE_LISTING.md`:
 
 **Basic Information:**
 
-- **Name**: Tab Cleaner
+- **Name**: Tab Magic
 - **Summary**: Clean up inactive browser tabs with a beautiful, modern interface. Boost productivity and reduce memory usage.
 - **Category**: Productivity
 - **Language**: English
@@ -76,7 +76,7 @@ Use the content from `STORE_LISTING.md`:
 ```
 Clean Up Your Browser Tabs with Style
 
-Tab Cleaner helps you maintain a clean and organized browser by automatically identifying and closing tabs that have been inactive for your chosen amount of time. Built with a beautiful, modern interface using React and shadcn/ui components.
+Tab Magic helps you maintain a clean and organized browser by automatically identifying and closing tabs that have been inactive for your chosen amount of time. Built with a beautiful, modern interface using React and shadcn/ui components.
 
 Key Features:
 ✨ Smart Tab Detection - Automatically identifies inactive tabs based on your preferences
@@ -88,7 +88,7 @@ Key Features:
 📱 Responsive Design - Optimized for all screen sizes
 
 How It Works:
-1. Click the Tab Cleaner icon in your browser toolbar
+1. Click the Tab Magic icon in your browser toolbar
 2. Choose your preferred inactivity time (5 minutes, 15 minutes, 30 minutes, 1 hour, or custom)
 3. Preview which tabs will be closed
 4. Click "Clean Tabs" to close inactive tabs
@@ -111,7 +111,7 @@ Built with modern web technologies including React, TypeScript, and Tailwind CSS
 **Keywords:**
 
 ```
-tab manager, browser cleanup, productivity, memory optimization, tab organizer, browser extension, inactive tabs, tab cleaner, browser tools, productivity tools
+tab manager, browser cleanup, productivity, memory optimization, tab organizer, browser extension, inactive tabs, tab magic, browser tools, productivity tools
 ```
 
 ### Step 4: Upload Assets

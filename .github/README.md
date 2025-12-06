@@ -1,6 +1,6 @@
 # GitHub Actions Workflow
 
-This repository includes an automated GitHub Actions workflow that builds and releases the Tab Cleaner extension.
+This repository includes an automated GitHub Actions workflow that builds and releases the Tab Magic extension.
 
 ## Workflow: Build and Release Extension
 
@@ -26,7 +26,7 @@ This repository includes an automated GitHub Actions workflow that builds and re
 
 ### Output
 - **Release**: A GitHub release tagged with the version (e.g., `v1.0.0`)
-- **Artifact**: The `tab-cleaner-extension.zip` file attached to the release
+- **Artifact**: The `tab-magic.zip` file attached to the release
 - **Release notes**: Automatic release notes with version information
 
 ### Requirements

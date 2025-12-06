@@ -2,7 +2,7 @@
 
 ## Extension Name
 
-Tab Cleaner
+Tab Magic
 
 ## Short Description (132 characters max)
 
@@ -12,7 +12,7 @@ Clean up inactive browser tabs with a beautiful, modern interface. Boost product
 
 **Clean Up Your Browser Tabs with Style**
 
-Tab Cleaner helps you maintain a clean and organized browser by automatically identifying and closing tabs that have been inactive for your chosen amount of time. Built with a beautiful, modern interface using React and shadcn/ui components.
+Tab Magic helps you maintain a clean and organized browser by automatically identifying and closing tabs that have been inactive for your chosen amount of time. Built with a beautiful, modern interface using React and shadcn/ui components.
 
 **Key Features:**
 ✨ **Smart Tab Detection** - Automatically identifies inactive tabs based on your preferences
@@ -22,13 +22,27 @@ Tab Cleaner helps you maintain a clean and organized browser by automatically id
 💾 **Memory Efficient** - Reduces browser memory usage by closing unused tabs
 🌙 **Theme Support** - Works with both light and dark browser themes
 📱 **Responsive Design** - Optimized for all screen sizes
+⌨️ **Keyboard Shortcuts** - Powerful keyboard shortcuts for quick actions
+📋 **Copy Tab URLs** - Instantly copy current tab URL to clipboard with a shortcut
+🔁 **Duplicate Tabs** - Quickly duplicate tabs with a keyboard shortcut
 
 **How It Works:**
 
-1. Click the Tab Cleaner icon in your browser toolbar
+1. Click the Tab Magic icon in your browser toolbar
 2. Choose your preferred inactivity time (5 minutes, 15 minutes, 30 minutes, 1 hour, or custom)
 3. Preview which tabs will be closed
 4. Click "Clean Tabs" to close inactive tabs
+
+**Keyboard Shortcuts:**
+
+Speed up your workflow with powerful keyboard shortcuts:
+
+- **Alt+Shift+K** - Open Tab Magic popup
+- **Alt+Shift+C** - Quickly clean inactive tabs with current settings
+- **Alt+Shift+Y** - Copy current tab URL to clipboard (shows visual confirmation)
+- **Alt+Shift+D** - Duplicate the current tab
+
+All shortcuts are fully customizable in Chrome's extension shortcuts settings. The copy URL feature displays a beautiful in-page notification when the URL is successfully copied.
 
 **Perfect For:**
 
@@ -56,7 +70,7 @@ English
 
 ## Keywords
 
-tab manager, browser cleanup, productivity, memory optimization, tab organizer, browser extension, inactive tabs, tab cleaner, browser tools, productivity tools
+tab manager, browser cleanup, productivity, memory optimization, tab organizer, browser extension, inactive tabs, tab magic, browser tools, productivity tools, keyboard shortcuts, copy url, duplicate tab, tab utilities
 
 ## Screenshots Required
 

@@ -1,4 +1,4 @@
-# Tab Cleaner Extension
+# Tab Magic Extension
 
 A beautiful browser extension to clean inactive tabs with a modern UI built using React and shadcn/ui components.
 
@@ -9,6 +9,29 @@ A beautiful browser extension to clean inactive tabs with a modern UI built usin
 - Dark/light theme support
 - Real-time preview of tabs to be closed
 - Responsive design optimized for browser extension popups
+- Keyboard shortcuts for quick actions
+
+## Keyboard Shortcuts
+
+The extension provides several keyboard shortcuts for quick access to common actions:
+
+- **Alt+Shift+K** - Open Tab Magic popup
+- **Alt+Shift+C** - Quickly clean inactive tabs with current settings
+- **Alt+Shift+Y** - Copy current tab URL to clipboard
+- **Alt+Shift+D** - Duplicate the current tab
+
+### Copy Current Tab URL
+
+The **Alt+Shift+Y** shortcut allows you to quickly copy the URL of the currently active tab to your clipboard. When invoked:
+
+- The URL is copied to your clipboard automatically
+- A visual notification appears in the top-right corner of the current page
+- The notification displays a success message with the copied URL
+- The notification automatically dismisses after 3 seconds
+
+This is especially useful for quickly sharing links or saving URLs without having to manually select and copy them.
+
+You can customize these shortcuts in Chrome by going to `chrome://extensions/shortcuts` and finding "Tab Magic" in the list.
 
 ## Development
 

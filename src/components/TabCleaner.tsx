@@ -193,10 +193,10 @@ const TabCleaner: React.FC = () => {
           <CardTitle className="text-lg flex items-center gap-2 text-white">
             <img 
               src="/images/icon-32.png" 
-              alt="Tab Cleaner" 
+              alt="Tab Magic" 
               className="w-5 h-5"
             />
-            Tab Cleaner
+            Tab Magic
           </CardTitle>
           <CardDescription className="text-sm text-white/70">
             {configuredCommands['_execute_action'] ? (

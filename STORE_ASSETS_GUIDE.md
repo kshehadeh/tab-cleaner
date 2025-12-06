@@ -63,7 +63,7 @@ Create screenshots showing your extension in action:
 
 **Logo/Brand Image:**
 
-- Use your existing `tab-cleaner-logo-512.png`
+- Use your existing `tab-magic-logo-512.png` (or `tab-cleaner-logo-512.png` if not yet renamed)
 - Can be used as promotional material
 
 ## Asset Creation Tips
